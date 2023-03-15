@@ -5,6 +5,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -24,16 +26,28 @@ class MainActivity : AppCompatActivity() {
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
 
+        // Set the expandable content title  & picture for the notification.
+        val bigPictureStyle: NotificationCompat.BigPictureStyle = NotificationCompat.BigPictureStyle()
+        bigPictureStyle.bigPicture(getBitmap(R.drawable.ic_launcher_background))
+            .setBigContentTitle("Big Content Title")
+            .setSummaryText("My long notification message that needs to be expanded goes here.");
+
+
         // Build NotificationCompat
         val channelId = "channelId"
         val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Notification Title")
             .setContentText("Notification Content")
+            .setLargeIcon(getBitmap(R.drawable.ic_launcher_background))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             // Set the intent that will fire when the user taps the notification
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            // Set style
+            .setStyle(bigPictureStyle)
+            
+
 
 
         // Create an intent for the action
@@ -63,6 +77,20 @@ class MainActivity : AppCompatActivity() {
             notificationManager.notify(101, builder.build())
         }
 
+    }
+
+    private fun getBitmap(drawableRes: Int): Bitmap? {
+        val drawable = resources.getDrawable(drawableRes)
+        val canvas = Canvas()
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        canvas.setBitmap(bitmap)
+        drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+        drawable.draw(canvas)
+        return bitmap
     }
 
 }
