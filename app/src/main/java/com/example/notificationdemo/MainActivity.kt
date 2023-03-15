@@ -9,6 +9,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
+import android.widget.RemoteViews
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 
@@ -77,6 +79,54 @@ class MainActivity : AppCompatActivity() {
             notificationManager.notify(101, builder.build())
         }
 
+
+        // Event
+        findViewById<TextView>(R.id.tvCustomLayoutNotification).setOnClickListener {
+            handleCustomLayoutNotification()
+        }
+
+    }
+
+    private fun handleCustomLayoutNotification() {
+        // Create a RemoteViews object and set its layout.
+        val remoteViews = RemoteViews(packageName, R.layout.layout_custom_notification)
+
+        // Set the notification icon, title, and text.
+        remoteViews.setImageViewResource(R.id.notification_icon, R.drawable.ic_notification)
+        remoteViews.setTextViewText(R.id.notification_title, "Custom Layout Notification Title")
+        remoteViews.setTextViewText(R.id.notification_text, "Custom Layout Notification Text")
+
+        // Set the button text and click event.
+        remoteViews.setTextViewText(R.id.notification_button, "Custom Button")
+        val buttonIntent = Intent(this, CustomLayoutBroadcastReceiver::class.java)
+        buttonIntent.action = "MY_ACTION";
+        buttonIntent.putExtra("EXTRA_KEY", "EXTRA_VALUE");
+        val buttonPendingIntent = PendingIntent.getBroadcast(this, 0, buttonIntent, PendingIntent. FLAG_IMMUTABLE)
+        remoteViews.setOnClickPendingIntent(R.id.notification_button, buttonPendingIntent)
+
+        // Build NotificationCompat
+        val channelId = "customLayoutChannelId"
+        val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(remoteViews)
+            .setAutoCancel(true)
+
+        // Create NotificationChannel & NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(channelId, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+            notificationManager.notify(102, builder.build())
+        }
     }
 
     private fun getBitmap(drawableRes: Int): Bitmap? {
