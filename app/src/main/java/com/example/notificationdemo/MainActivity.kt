@@ -1,5 +1,6 @@
 package com.example.notificationdemo
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -93,14 +94,13 @@ class MainActivity : AppCompatActivity() {
 
         // Set the notification icon, title, and text.
         remoteViews.setImageViewResource(R.id.notification_icon, R.drawable.ic_notification)
-        remoteViews.setTextViewText(R.id.notification_title, "Custom Layout Notification Title")
-        remoteViews.setTextViewText(R.id.notification_text, "Custom Layout Notification Text")
+        remoteViews.setTextViewText(R.id.notification_title, "Custom Title")
+        remoteViews.setTextViewText(R.id.notification_text, "Custom Text")
 
         // Set the button text and click event.
-        remoteViews.setTextViewText(R.id.notification_button, "Custom Button")
+        remoteViews.setTextViewText(R.id.notification_button, "Click")
         val buttonIntent = Intent(this, CustomLayoutBroadcastReceiver::class.java)
         buttonIntent.action = "MY_ACTION";
-        buttonIntent.putExtra("EXTRA_KEY", "EXTRA_VALUE");
         val buttonPendingIntent = PendingIntent.getBroadcast(this, 0, buttonIntent, PendingIntent. FLAG_IMMUTABLE)
         remoteViews.setOnClickPendingIntent(R.id.notification_button, buttonPendingIntent)
 
